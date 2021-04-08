@@ -1,10 +1,13 @@
-import React from 'react'
+import React from 'react';
+import {HeaderMessage, FooterMessage} from '../components/Common/WelcomeMessage';
 
 const Login = () => {
     return (
-        <div>
-           LOGIN 
-        </div>
+        <>
+            <HeaderMessage />
+
+            <FooterMessage />
+        </>
     )
 }
 
