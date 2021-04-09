@@ -1,6 +1,6 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState} from 'react'
 import { FooterMessage, HeaderMessage } from '../components/Common/WelcomeMessage'
-import {Form, Button, Message, Segment, TextArea, Divider} from 'semantic-ui-react';
+import {Form, Button, Message, Segment} from 'semantic-ui-react';
 const regexUserName = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
 
 const Signup = () => {

@@ -5,7 +5,6 @@ const Login = () => {
     return (
         <>
             <HeaderMessage />
-
             <FooterMessage />
         </>
     )
