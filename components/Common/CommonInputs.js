@@ -50,7 +50,9 @@ const CommonInputs = ({user:{bio, facebook, instagram, youtube, twitter}, handle
                 value={youtube}
                 onChange={handleChange}
             />
-            </>}
+            {/* <Message icon='attention' info size='small' header='Social media links are optional.' /> */}
+            </>
+            }
         </>
     )
 }

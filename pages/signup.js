@@ -1,6 +1,8 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import { FooterMessage, HeaderMessage } from '../components/Common/WelcomeMessage'
-import {Form, Button, Message, Segment} from 'semantic-ui-react';
+import {Form, Button, Message, Segment, Divider} from 'semantic-ui-react';
+import CommonInputs from '../components/Common/CommonInputs';
+import ImageDropDiv from '../components/Common/ImageDropDiv';
 const regexUserName = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
 
 const Signup = () => {
@@ -16,22 +18,36 @@ const Signup = () => {
     });
 
     const {name, email, password, bio} = user;
+    //formik
+    useEffect(() => {
+      const isUser = Object.values({name,email,password,bio}).every(item =>Boolean(item));  
+      isUser ? setSubmitDisabled(false) : setSubmitDisabled(true);
+    }, [user])
 
-    const [showSocialLink, setSocialLinks] = useState(false);
+    const [showSocialLinks, setShowSocialLinks] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
+    const [formLoading, setFormLoading] = useState(false);
+    const [submitDisabled, setSubmitDisabled] = useState(true);
     const [username, setUsername] = useState('');
     const [usernameLoading, setUsernameLoading] = useState(false);
     const [usernameAvailable, setUsernameAvailable] = useState(false);
-    const [formLoading, setFormLoading] = useState(false);
+    const [mediaPreview, setMediaPreview] = useState(null);
+    const [media, setMedia] = useState(null);
+    const [highlighted, setHighlighted] = useState(false);
 
     const handleSubmit = e => e.preventDefault();
 
     const handleChange = (e) => {
-        const {name, value} = e.target;
-
+        const {name, value, files} = e.target;
+        if(name === 'media'){
+            setMedia(files[0]);
+            setMediaPreview(URL.createObjectURL(files[0]));
+        }
         setUser(prev => ({...prev, [name]: value}));
     };
+
+    const inputRef = useRef();
 
     return (
         <>
@@ -39,6 +55,16 @@ const Signup = () => {
             <Form onSubmit={handleSubmit} loading={formLoading} error={errorMsg !== null}>
             <Message error header='Oops!' content={errorMsg} onDismiss={()=>setErrorMsg(null)} />
             <Segment>
+                <ImageDropDiv 
+                    mediaPreview={mediaPreview} 
+                    setMediaPreview={setMediaPreview} 
+                    setMedia={setMedia} 
+                    inputRef={inputRef}
+                    media={media}
+                    highlighted={highlighted}
+                    setHighlighted={setHighlighted}
+                    handleChange={handleChange}
+                />
                 <Form.Input 
                     label="Name" 
                     placeholder='Name'
@@ -98,8 +124,16 @@ const Signup = () => {
                     fluid 
                     icon={usernameAvailable ? 'check': 'close'}
                     iconPosition='left' 
-                    type='email'
+                    type='text'
                 />
+                <CommonInputs 
+                    user={user} 
+                    showSocialLinks={showSocialLinks} 
+                    setShowSocialLinks={setShowSocialLinks}
+                    handleChange={handleChange}
+                />
+                <Divider hidden />
+                <Button icon='signup' content='Signup' type='submit' color='orange' disabled={submitDisabled || !usernameAvailable } />
             </Segment>
             </Form>
             <FooterMessage />
