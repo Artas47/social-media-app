@@ -7,7 +7,7 @@ const ProfileSchema = new Schema({
         ref: 'User'
     },
     bio: {
-        stype: String,
+        type: String,
         required: true
     },
     socials: {

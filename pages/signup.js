@@ -3,7 +3,7 @@ import { FooterMessage, HeaderMessage } from '../components/Common/WelcomeMessag
 import {Form, Button, Message, Segment, Divider} from 'semantic-ui-react';
 import CommonInputs from '../components/Common/CommonInputs';
 import ImageDropDiv from '../components/Common/ImageDropDiv';
-const regexUserName = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
+import { regexUserName } from '../utils/authUser';
 
 const Signup = () => {
     const [user, setUser] = useState({

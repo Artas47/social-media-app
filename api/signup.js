@@ -1,0 +1,87 @@
+const express = require('express');
+const router = express.Router();
+const UserModel = require('../models/UserModel');
+const ProfileModel = require('../models/ProfileModel');
+const FollowerModel = require('../models/FollowerModel');
+const jwt =require('jsonwebtoken');
+const brypt = require('bcryptjs');
+const isEmail = require('validator/lib/isEmail');
+const { regexUserName } = require('../utils/authUser');
+const userPng = "https://res.cloudinary.com/indersingh/image/upload/v1593464618/App/user_mklcpl.png";
+
+
+router.get('/:username', async(req,res) => {
+    const {username} = req.params;
+
+    try{
+        if(username.length < 1 || !regexUserName.test(username)) return res.state(401).send('Invalid');
+
+        const user = await UserModel.findOne({username: username.toLowerCase()});
+        if(user){ 
+            return res.status(401).send('Username already taken')
+        }
+        return res.status(200).send('Available');
+    }catch(error) {
+        console.error(error);
+        return res.status(500).send('Server error')
+    }
+});
+
+router.post('/', async(req,res) => {
+    const {
+        name,
+        email,
+        password,
+        username,
+        bio,
+        facebook,
+        youtube,
+        twitter,
+        instagram
+    } = req.body.user;
+
+    if(!isEmail(email)) return res.state(401).send('Invalid email');
+    if(password.length < 6 ) return res.state(401).send('Password must be at least 6 characters');
+
+    try{
+        let user;
+        user = await UserModel.findOne({email: email.toLowerCase()});
+        if(user){
+            return res.status(401).send('User already registered');
+        }
+        user = new UserModel({
+            name, 
+            email: email.toLowerCase(), 
+            username: username.toLowerCase(),
+            password,
+            profilePicUrl: req.body.profilePicUrl || userPng,
+        });
+        user.password = await bcrypt.hash(password, 10);
+        await user.save();
+
+        let profileFields ={}
+        profileFields.user = user._id;
+        profileFields.bio = bio,
+        profileFields.socials = {}
+        if(facebook) profileFields.socials.facebook = facebook;
+        if(twitter) profileFields.socials.twitter = twitter;
+        if(youtube) profileFields.socials.youtube = youtube;
+        if(instagram) profileFields.socials.instagram = instagram;
+
+        await new ProfileModel(profileFields).save();
+        await new FollowerModel({user: user._id, followers: [], following: []}).save();
+
+        const payload = {userId: user._id};
+        jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn: '2d'}, (err, token) => {
+            if(err) throw err;
+            res.status(200).json(token);
+        });
+
+    }catch(error) {
+        console.error(error);
+        return res.status(500).send('Server error')
+    }
+});
+
+module.exports = router;
+
