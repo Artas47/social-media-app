@@ -4,9 +4,9 @@ const UserModel = require('../models/UserModel');
 const ProfileModel = require('../models/ProfileModel');
 const FollowerModel = require('../models/FollowerModel');
 const jwt =require('jsonwebtoken');
-const brypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 const isEmail = require('validator/lib/isEmail');
-const { regexUserName } = require('../utils/authUser');
+const { regexUserName } = require('../utils/utils');
 const userPng = "https://res.cloudinary.com/indersingh/image/upload/v1593464618/App/user_mklcpl.png";
 
 
@@ -14,13 +14,15 @@ router.get('/:username', async(req,res) => {
     const {username} = req.params;
 
     try{
-        if(username.length < 1 || !regexUserName.test(username)) return res.state(401).send('Invalid');
+        if(username.length < 1 || !regexUserName.test(username)) return res.status(401).send('Invalid');
+
+        if (!regexUserName.test(username)) return res.status(401).send("Invalid");
 
         const user = await UserModel.findOne({username: username.toLowerCase()});
         if(user){ 
             return res.status(401).send('Username already taken')
         }
-        return res.status(200).send('Available');
+        return res.status(200).send('available');
     }catch(error) {
         console.error(error);
         return res.status(500).send('Server error')
@@ -40,8 +42,8 @@ router.post('/', async(req,res) => {
         instagram
     } = req.body.user;
 
-    if(!isEmail(email)) return res.state(401).send('Invalid email');
-    if(password.length < 6 ) return res.state(401).send('Password must be at least 6 characters');
+    if(!isEmail(email)) return res.status(401).send('Invalid email');
+    if(password.length < 6 ) return res.status(401).send('Password must be at least 6 characters');
 
     try{
         let user;

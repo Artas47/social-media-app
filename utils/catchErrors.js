@@ -18,7 +18,7 @@ const catchErrors = (error, displayError) => {
 
     console.error(errorMsg);
   }
-  displayError(errorMsg);
+//   displayError(errorMsg);
 };
 
 export default catchErrors;

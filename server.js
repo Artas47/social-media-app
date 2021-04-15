@@ -1,4 +1,5 @@
 const app = require('express')();
+var express = require('express');
 const server = require('http').Server(app);
 const next = require('next');
 const dev = process.env.NODE_ENV !== 'production';
@@ -10,6 +11,7 @@ const port = process.env.PORT || 3000;
 connectDb();
 
 nextApp.prepare().then(() => {
+    app.use(express.json());
     app.use('/api/signup', require('./api/signup'));
     app.use('/api/auth', require('./api/auth'))
 

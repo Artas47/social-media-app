@@ -1,3 +1,1 @@
-const baseUrl ="http://localhost:3000";
-
-export default baseUrl;
+export const baseUrl ="http://localhost:3000";

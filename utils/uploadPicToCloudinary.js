@@ -12,7 +12,6 @@ const uploadPic = async (media) => {
     }catch(error){
         return;
     }
-
 }
 
 export default uploadPic;

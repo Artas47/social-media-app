@@ -3,7 +3,13 @@ import { FooterMessage, HeaderMessage } from '../components/Common/WelcomeMessag
 import {Form, Button, Message, Segment, Divider} from 'semantic-ui-react';
 import CommonInputs from '../components/Common/CommonInputs';
 import ImageDropDiv from '../components/Common/ImageDropDiv';
-import { regexUserName } from '../utils/authUser';
+import { regexUserName } from '../utils/utils';
+import axios from 'axios';
+import { baseUrl } from '../utils/baseUrl';
+import { registerUser } from '../utils/authUser';
+import uploadPic from '../utils/uploadPicToCloudinary';
+
+let cancel;
 
 const Signup = () => {
     const [user, setUser] = useState({
@@ -19,11 +25,8 @@ const Signup = () => {
 
     const {name, email, password, bio} = user;
     //formik
-    useEffect(() => {
-      const isUser = Object.values({name,email,password,bio}).every(item =>Boolean(item));  
-      isUser ? setSubmitDisabled(false) : setSubmitDisabled(true);
-    }, [user])
-
+    
+    
     const [showSocialLinks, setShowSocialLinks] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
@@ -36,7 +39,55 @@ const Signup = () => {
     const [media, setMedia] = useState(null);
     const [highlighted, setHighlighted] = useState(false);
 
-    const handleSubmit = e => e.preventDefault();
+    console.log(`usernameAvailable`, usernameAvailable)
+    useEffect(() => {
+      const isUser = Object.values({name,email,password,bio}).every(item =>Boolean(item));  
+      isUser ? setSubmitDisabled(false) : setSubmitDisabled(true);
+    }, [user])
+
+    const checkUsername = async () => {
+        setUsernameLoading(true);
+        try{
+            cancel && cancel();
+            const CancelToken = axios.CancelToken;
+            const res = await axios.get(`${baseUrl}/api/signup/${username}`, {cancelToken: new CancelToken(canceler => {
+                cancel = canceler;
+            })})
+            errorMsg !== null && setErrorMsg(null);
+            if(res.data === 'available'){
+                setUsernameAvailable(true);
+                setUser(prev => ({...prev, username}))
+            }
+        }catch(error){
+            console.log(`error`, error)
+            setErrorMsg('Username not available');
+            setUsernameAvailable(false);
+        }
+        setUsernameLoading(false);
+    }
+
+    useEffect(() => {
+        if(username === '') {
+            setUsernameAvailable(false);
+        } else {
+            checkUsername();
+        }
+    }, [username]);
+
+
+    const handleSubmit = async e => {
+        e.preventDefault();
+        setFormLoading(true);
+        let profilePicUrl;
+        if(media !== null){
+            profilePicUrl = await uploadPic(media);
+        }
+        if(media !== null && !profilePicUrl){
+            setFormLoading(false);
+            return setErrorMsg('Error uploading image')
+        }
+        await registerUser(user, profilePicUrl, setErrorMsg, setFormLoading)
+    };
 
     const handleChange = (e) => {
         const {name, value, files} = e.target;
@@ -114,6 +165,8 @@ const Signup = () => {
                     placeholder='Username'
                     value={username} 
                     onChange={e => {
+                        // console.log(`e.target.value`, e.target.value)
+                        // console.log(`regexUserName.test(e.target.value)`, regexUserName.test(e.target.value))
                         setUsername(e.target.value);
                         if(regexUserName.test(e.target.value)){
                             setUsernameAvailable(true);

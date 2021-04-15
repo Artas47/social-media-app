@@ -3,7 +3,7 @@ const router = express.Router();
 const UserModel = require('../models/UserModel');
 const FollowerModel = require('../models/FollowerModel');
 const jwt =require('jsonwebtoken');
-const brypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 const isEmail = require('validator/lib/isEmail');
 
 router.post('/', async(req,res) => {
@@ -12,8 +12,8 @@ router.post('/', async(req,res) => {
         password,
     } = req.body.user;
 
-    if(!isEmail(email)) return res.state(401).send('Invalid email');
-    if(password.length < 6 ) return res.state(401).send('Password must be at least 6 characters');
+    if(!isEmail(email)) return res.status(401).send('Invalid email');
+    if(password.length < 6 ) return res.status(401).send('Password must be at least 6 characters');
 
     try{
         const user = await UserModel.findOne({email: email.toLowerCase()}).select('+password');
