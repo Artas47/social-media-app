@@ -22,11 +22,7 @@ const Signup = () => {
         twitter: '',
         instagram: ''
     });
-
     const {name, email, password, bio} = user;
-    //formik
-    
-    
     const [showSocialLinks, setShowSocialLinks] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
@@ -39,7 +35,6 @@ const Signup = () => {
     const [media, setMedia] = useState(null);
     const [highlighted, setHighlighted] = useState(false);
 
-    console.log(`usernameAvailable`, usernameAvailable)
     useEffect(() => {
       const isUser = Object.values({name,email,password,bio}).every(item =>Boolean(item));  
       isUser ? setSubmitDisabled(false) : setSubmitDisabled(true);
@@ -165,8 +160,6 @@ const Signup = () => {
                     placeholder='Username'
                     value={username} 
                     onChange={e => {
-                        // console.log(`e.target.value`, e.target.value)
-                        // console.log(`regexUserName.test(e.target.value)`, regexUserName.test(e.target.value))
                         setUsername(e.target.value);
                         if(regexUserName.test(e.target.value)){
                             setUsernameAvailable(true);
