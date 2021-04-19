@@ -1,29 +1,32 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const ProfileSchema = new Schema({
+const ProfileSchema = new Schema(
+  {
     user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     bio: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     socials: {
-        youtube: {
-            type: String
-        },
-        twitter: {
-            type: String
-        },
-        instagram: {
-            type: String
-        },
-        facebook: {
-            type: String
-        },
-    }
-}, {timestamps: true})
+      youtube: {
+        type: String,
+      },
+      twitter: {
+        type: String,
+      },
+      instagram: {
+        type: String,
+      },
+      facebook: {
+        type: String,
+      },
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Profile', ProfileSchema);
+module.exports = mongoose.model("Profile", ProfileSchema);
