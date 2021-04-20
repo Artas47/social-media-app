@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 
 const Index = ({ user, userFollowStats }) => {
-  console.log(`user`, user);
-  console.log(`userFollowStats`, userFollowStats);
+  useEffect(() => {
+    document.title = `Welcome, ${user.name.split(" ")[0]}`;
+  }, []);
+
   return <div>Homepage</div>;
 };
 
