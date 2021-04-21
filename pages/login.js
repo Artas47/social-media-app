@@ -5,6 +5,7 @@ import {
 } from "../components/Common/WelcomeMessage";
 import { Form, Button, Message, Segment, Divider } from "semantic-ui-react";
 import { loginUser } from "../utils/authUser";
+import cookie from "js-cookie";
 
 const Login = () => {
   const [user, setUser] = useState({
@@ -16,6 +17,21 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(true);
+
+  useEffect(() => {
+    const isUser = Object.values({ email, password }).every((item) =>
+      Boolean(item)
+    );
+    isUser ? setSubmitDisabled(false) : setSubmitDisabled(true);
+  }, [user]);
+
+  useEffect(() => {
+    document.title = "Welcome back";
+    const userEmail = cookie.get("userEmail");
+    if (userEmail) {
+      setUser((prev) => ({ ...prev, email: userEmail }));
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -29,13 +45,6 @@ const Login = () => {
   };
 
   const { email, password } = user;
-
-  useEffect(() => {
-    const isUser = Object.values({ email, password }).every((item) =>
-      Boolean(item)
-    );
-    isUser ? setSubmitDisabled(false) : setSubmitDisabled(true);
-  }, [user]);
 
   return (
     <>
