@@ -20,11 +20,8 @@ const SearchComponent = () => {
 
   const handleChange = async (e) => {
     const { value } = e.target;
-    if (!value) {
-      setText(value);
-      return;
-    }
     setText(value);
+    if (!value.trim()) return;
     setLoading(true);
 
     try {
