@@ -4,6 +4,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const UserModel = require("../models/UserModel");
 const PostModel = require("../models/PostModel");
 const FollowerModel = require("../models/FollowerModel");
+const uuid = require("uuid").v4;
 
 router.post("/", authMiddleware, async (req, res) => {
   const { text, location, picUrl } = req.body;
@@ -20,7 +21,7 @@ router.post("/", authMiddleware, async (req, res) => {
     if (picUrl) newPost.picUrl = picUrl;
     const post = await new PostModel(newPost).save();
 
-    return res.json(post);
+    return res.json(post._id);
   } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
@@ -79,68 +80,155 @@ router.delete("/:postId", authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/like/:postId', authMiddleware, (req, res) => {
-  try{
-    const postId = req.params;
-    const {userId} = req;
+router.post("/like/:postId", authMiddleware, async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req;
 
     const post = await PostModel.findById(postId);
     if (!post) {
       return res.status(404).send("Post not found");
     }
-    const isLiked = post.likes.filter(like => like.user.toString() === userId).length > 0;
-    if(isLiked){
-      return res.status(401).send('Post already liked')
+    const isLiked =
+      post.likes.filter((like) => like.user.toString() === userId).length > 0;
+    if (isLiked) {
+      return res.status(401).send("Post already liked");
     }
 
-    await post.likes.unshift({user: userId});
+    await post.likes.unshift({ user: userId });
     await post.save();
 
-    return res.status(200).send('Post liked')
-  }catch (error) {
+    return res.status(200).send("Post liked");
+  } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
   }
 });
 
-router.put('/unlike/:postId', authMiddleware, (req, res) => {
-  try{
+router.put("/unlike/:postId", authMiddleware, async (req, res) => {
+  try {
     const postId = req.params;
-    const {userId} = req;
+    const { userId } = req;
 
     const post = await PostModel.findById(postId);
     if (!post) {
       return res.status(404).send("Post not found");
     }
-    const isLiked = post.likes.filter(like => like.user.toString() === userId).length === 0;
-    if(isLiked){
-      return res.status(401).send('Post not liked before')
+    const isLiked =
+      post.likes.filter((like) => like.user.toString() === userId).length === 0;
+    if (isLiked) {
+      return res.status(401).send("Post not liked before");
     }
 
-    const index = post.likes.map(like => like.user.toString()).indexOf(userId);
+    const index = post.likes
+      .map((like) => like.user.toString())
+      .indexOf(userId);
 
     await post.likes.splice(index, 1);
     await post.save();
-    return res.status(200).send('Post unliked')
-  }catch (error) {
+    return res.status(200).send("Post unliked");
+  } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
   }
 });
 
-router.get('/like/:postId', authMiddleware, (req, res) => {
-  try{
+router.get("/like/:postId", authMiddleware, async (req, res) => {
+  try {
     const postId = req.params;
-    
-    const post = await PostModel.findById(postId).populate('likes.user');
+    const post = await PostModel.findById(postId).populate("likes.user");
     if (!post) {
       return res.status(404).send("Post not found");
     }
     return res.status(200).send(post.likes);
-  }catch (error) {
+  } catch (error) {
     console.error(error);
     return res.status(500).send("Server error");
   }
 });
+
+router.get("/like/:postId", authMiddleware, async (req, res) => {
+  try {
+    const postId = req.params;
+    const post = await PostModel.findById(postId).populate("likes.user");
+    if (!post) {
+      return res.status(404).send("Post not found");
+    }
+    return res.status(200).send(post.likes);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server error");
+  }
+});
+
+router.post("/comment/:postId", authMiddleware, async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const post = await PostModel.findById(postId);
+    if (!post) {
+      return res.status(404).send("Post not found");
+    }
+    const { text } = req.body;
+    if (text.length < 1) {
+      return res.status(401).send("Comment should be atlease 1 character");
+    }
+    const comment = {
+      _id: uuid(),
+      user: req.userId,
+      text,
+      date: Date.now(),
+    };
+    await post.comments.unshift(comment);
+    await post.save();
+    return res.status(200).send(comment._id);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server error");
+  }
+});
+
+router.delete(
+  "/comment/:postId/:commentId",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const { postId, commentId } = req.params;
+      const post = await PostModel.findById(postId);
+      if (!post) {
+        return res.status(404).send("Post not found");
+      }
+
+      const comment = post.comments.find(
+        (comment) => comment._id === commentId
+      );
+      if (!comment) {
+        return res.status(404).send("Comment not found");
+      }
+
+      const deleteComment = async () => {
+        const indexOf = post.comments
+          .map((comment) => comment._id)
+          .indexOf(commentId);
+        await post.comments.splice(indexOf, 1);
+        await post.save();
+        return res.status(200).send("Comment deleted");
+      };
+
+      const user = await UserModel.findById(req.userId);
+
+      if (comment.user.toString() !== req.userId) {
+        if (user.role === "root") {
+          await deleteComment();
+        } else {
+          return res.status(401).send("You cannot delete this post");
+        }
+      }
+      await deleteComment();
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send("Server error");
+    }
+  }
+);
 
 module.exports = router;
