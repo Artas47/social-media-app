@@ -14,7 +14,7 @@ const Index = ({ user, postsData, errorLoading }) => {
   const [posts, setPosts] = useState(postsData);
   const [showToastr, setShowToastr] = useState(false);
 
-  if (posts.length === 0 || errorLoading) {
+  if (posts?.length === 0 || errorLoading) {
     return <NoPosts />;
   }
 
@@ -42,6 +42,7 @@ Index.getInitialProps = async (ctx) => {
     const res = await axios.get(`${baseUrl}/api/posts`, {
       headers: { Authorization: token },
     });
+    console.log(`res`, res);
     return { postsData: res.data };
   } catch (error) {
     return { errorLoading: true };
