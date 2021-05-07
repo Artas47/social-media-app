@@ -10,6 +10,10 @@ const Index = ({ user, postsData, errorLoading }) => {
   useEffect(() => {
     document.title = `Welcome, ${user.name.split(" ")[0]}`;
   }, []);
+
+  useEffect(() => {
+    showToastr && setTimeout(() => setShowToastr(false), 3000);
+  }, [showToastr]);
   console.log(`postsData`, postsData);
   const [posts, setPosts] = useState(postsData);
   const [showToastr, setShowToastr] = useState(false);
@@ -19,20 +23,23 @@ const Index = ({ user, postsData, errorLoading }) => {
   }
 
   return (
-    <Segment>
-      <CreatePost user={user} setPosts={setPosts} />
-      {posts.map((post) => {
-        return (
-          <CardPost
-            key={post._id}
-            post={post}
-            user={user}
-            setPosts={setPosts}
-            setShowToastr={setShowToastr}
-          />
-        );
-      })}
-    </Segment>
+    <>
+      {showToastr && <PostDeleteToastr />}
+      <Segment>
+        <CreatePost user={user} setPosts={setPosts} />
+        {posts.map((post) => {
+          return (
+            <CardPost
+              key={post._id}
+              post={post}
+              user={user}
+              setPosts={setPosts}
+              setShowToastr={setShowToastr}
+            />
+          );
+        })}
+      </Segment>
+    </>
   );
 };
 

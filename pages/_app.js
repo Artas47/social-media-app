@@ -4,6 +4,7 @@ import axios from "axios";
 import { parseCookies, destroyCookie } from "nookies";
 import { baseUrl } from "../utils/baseUrl";
 import { redirectUser } from "../utils/authUser";
+import "react-toastify/dist/ReactToastify.css";
 import React from "react";
 
 function MyApp({ Component, pageProps }) {

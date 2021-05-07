@@ -3,6 +3,7 @@ import { Link } from "next/router";
 import { Segment, Card, Image, Popup, Divider } from "semantic-ui-react";
 import PostComments from "./PostComments";
 import CommentInputField from "./CommentInputField";
+import { deletePost } from "../../utils/postActions";
 
 const CardPost = ({ post, user, setPosts, setShowToastr }) => {
   const [likes, setLikes] = useState(post.likes);
@@ -49,7 +50,12 @@ const CardPost = ({ post, user, setPosts, setShowToastr }) => {
                 <Header as="h4" content="Are you sure?" />
                 <p>This action is irreversible!</p>
 
-                <Button color="red" icon="thrash" content="Delete" />
+                <Button
+                  color="red"
+                  icon="thrash"
+                  content="Delete"
+                  onClick={() => deletePost(post._id, setPosts, setShowToastr)}
+                />
               </Popup>
             )}
             <Card.Header>
