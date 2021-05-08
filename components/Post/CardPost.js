@@ -3,7 +3,7 @@ import { Link } from "next/router";
 import { Segment, Card, Image, Popup, Divider } from "semantic-ui-react";
 import PostComments from "./PostComments";
 import CommentInputField from "./CommentInputField";
-import { deletePost } from "../../utils/postActions";
+import { deletePost, likePost } from "../../utils/postActions";
 
 const CardPost = ({ post, user, setPosts, setShowToastr }) => {
   const [likes, setLikes] = useState(post.likes);
@@ -81,6 +81,9 @@ const CardPost = ({ post, user, setPosts, setShowToastr }) => {
               name={isLiked ? "heart" : "heart outline"}
               color="red"
               style={{ cursor: "pointer" }}
+              onClick={() =>
+                likePost(post._id, user._id, setLikes, isLiked ? false : true)
+              }
             />
             {likes.length > 0 && (
               <span className="spanLikesList">
