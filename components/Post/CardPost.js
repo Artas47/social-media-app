@@ -1,9 +1,19 @@
 import React, { useState } from "react";
-import { Link } from "next/router";
-import { Segment, Card, Image, Popup, Divider } from "semantic-ui-react";
+import Link from "next/link";
+import {
+  Segment,
+  Card,
+  Image,
+  Popup,
+  Divider,
+  Header,
+  Button,
+  Icon,
+} from "semantic-ui-react";
 import PostComments from "./PostComments";
 import CommentInputField from "./CommentInputField";
 import { deletePost, likePost } from "../../utils/postActions";
+import calculateTime from "../../utils/calculateTime";
 
 const CardPost = ({ post, user, setPosts, setShowToastr }) => {
   const [likes, setLikes] = useState(post.likes);

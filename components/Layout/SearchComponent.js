@@ -62,7 +62,6 @@ const SearchComponent = () => {
       minCharacters={1}
       onResultSelect={(e, data) => {
         Router.push(`/${data.result.username}`);
-        console.log(data.result);
       }}
     />
   );

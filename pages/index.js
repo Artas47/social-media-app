@@ -5,18 +5,20 @@ import { NoPosts } from "../components/Layout/NoData";
 import CreatePost from "../components/Post/CreatePost";
 import CardPost from "../components/Post/CardPost";
 import { Segment } from "semantic-ui-react";
+import { baseUrl } from "../utils/baseUrl";
 
 const Index = ({ user, postsData, errorLoading }) => {
   useEffect(() => {
     document.title = `Welcome, ${user.name.split(" ")[0]}`;
   }, []);
 
+  const [showToastr, setShowToastr] = useState(false);
+
   useEffect(() => {
     showToastr && setTimeout(() => setShowToastr(false), 3000);
   }, [showToastr]);
-  console.log(`postsData`, postsData);
+
   const [posts, setPosts] = useState(postsData);
-  const [showToastr, setShowToastr] = useState(false);
 
   if (posts?.length === 0 || errorLoading) {
     return <NoPosts />;
@@ -49,7 +51,6 @@ Index.getInitialProps = async (ctx) => {
     const res = await axios.get(`${baseUrl}/api/posts`, {
       headers: { Authorization: token },
     });
-    console.log(`res`, res);
     return { postsData: res.data };
   } catch (error) {
     return { errorLoading: true };

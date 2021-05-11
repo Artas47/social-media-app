@@ -1,6 +1,7 @@
 import axios from "axios";
 import cookie from "js-cookie";
 import catchErrors from "./catchErrors";
+import { baseUrl } from "./baseUrl";
 
 const Axios = axios.create({
   baseURL: `${baseUrl}/api/posts`,

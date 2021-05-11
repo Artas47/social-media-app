@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Form } from "semantic-ui-react";
+import { Form, Message, Image, Icon, Divider, Button } from "semantic-ui-react";
 import uploadPic from "../../utils/uploadPicToCloudinary";
 import { submitNewPost } from "../../utils/postActions";
 
@@ -38,9 +38,8 @@ const CreatePost = ({ user, setPosts }) => {
       }
     }
     await submitNewPost(
-      newPost,
+      newPost.text,
       newPost.location,
-      text,
       picUrl,
       setPosts,
       setNewPost,

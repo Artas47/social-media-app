@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Form } from "semantic-ui-react";
 
 const CommentInputField = ({ user, postId, setComments }) => {
-  const [test, setText] = useState("");
+  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
   return (
