@@ -6,6 +6,7 @@ import CreatePost from "../components/Post/CreatePost";
 import CardPost from "../components/Post/CardPost";
 import { Segment } from "semantic-ui-react";
 import { baseUrl } from "../utils/baseUrl";
+import { PostDeleteToastr } from "../components/Layout/Toastr";
 
 const Index = ({ user, postsData, errorLoading }) => {
   useEffect(() => {
