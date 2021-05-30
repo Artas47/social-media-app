@@ -7,6 +7,9 @@ import CardPost from "../components/Post/CardPost";
 import { Segment } from "semantic-ui-react";
 import { baseUrl } from "../utils/baseUrl";
 import { PostDeleteToastr } from "../components/Layout/Toastr";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { EndMessage, PlaceHolderPosts } from "../components/Layout/PlaceHolderGroup";
+import Cookies from "js-cookie";
 
 const Index = ({ user, postsData, errorLoading }) => {
   useEffect(() => {
@@ -14,12 +17,28 @@ const Index = ({ user, postsData, errorLoading }) => {
   }, []);
 
   const [showToastr, setShowToastr] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [pageNumber, setPageNumber] = useState(true);
 
   useEffect(() => {
     showToastr && setTimeout(() => setShowToastr(false), 3000);
   }, [showToastr]);
 
   const [posts, setPosts] = useState(postsData);
+
+  const fetchDataOnScroll = async () => {    
+    try {
+        const res = axios.get(`${baseUrl}/api/posts`, {headers: {Authorization: Cookies.get('token')}, params: {pageNumber}})
+        if(res.data.length === 0){
+            setHasMore(false);
+        } else {
+            setPosts(prev => [...prev, ...res.data]);
+            setPageNumber(prev => prev + 1);
+        }
+    } catch (error) {
+        alert('Error fetching posts', error)
+    }
+};
 
   if (posts?.length === 0 || errorLoading) {
     return <NoPosts />;
@@ -30,6 +49,13 @@ const Index = ({ user, postsData, errorLoading }) => {
       {showToastr && <PostDeleteToastr />}
       <Segment>
         <CreatePost user={user} setPosts={setPosts} />
+        <InfiniteScroll 
+            hasMore={hasMore} 
+            next={fetchDataOnScroll} 
+            loader={<PlaceHolderPosts />} 
+            endMessage={<EndMessage />}
+            dataLength={posts.length}
+        />
         {posts.map((post) => {
           return (
             <CardPost
@@ -51,6 +77,7 @@ Index.getInitialProps = async (ctx) => {
     const { token } = parseCookies(ctx);
     const res = await axios.get(`${baseUrl}/api/posts`, {
       headers: { Authorization: token },
+      params: {pageNumber: 1}
     });
     return { postsData: res.data };
   } catch (error) {
