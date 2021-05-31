@@ -40,33 +40,33 @@ const Index = ({ user, postsData, errorLoading }) => {
     }
 };
 
-  if (posts?.length === 0 || errorLoading) {
-    return <NoPosts />;
-  }
-
   return (
     <>
       {showToastr && <PostDeleteToastr />}
       <Segment>
         <CreatePost user={user} setPosts={setPosts} />
-        <InfiniteScroll 
+        {posts?.length === 0 || errorLoading ? <NoPosts /> : (
+            <InfiniteScroll 
             hasMore={hasMore} 
             next={fetchDataOnScroll} 
             loader={<PlaceHolderPosts />} 
             endMessage={<EndMessage />}
-            dataLength={posts.length}
-        />
+            dataLength={posts.length}>
+
         {posts.map((post) => {
-          return (
-            <CardPost
-              key={post._id}
-              post={post}
-              user={user}
-              setPosts={setPosts}
-              setShowToastr={setShowToastr}
-            />
-          );
-        })}
+            return (
+                <CardPost
+                key={post._id}
+                post={post}
+                user={user}
+                setPosts={setPosts}
+                setShowToastr={setShowToastr}
+                />
+                );
+            })}
+        </InfiniteScroll>
+        )}
+        
       </Segment>
     </>
   );
