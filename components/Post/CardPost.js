@@ -30,24 +30,33 @@ const CardPost = ({ post, user, setPosts, setShowToastr }) => {
   const [showModal, setShowModal] = useState(false);
 
   const addPropsToModal = () => ({
-    post, 
-    user, 
-    setLikes, 
-    likes, 
-    isLiked, 
-    comments, 
-    setComments
-  })
+    post,
+    user,
+    setLikes,
+    likes,
+    isLiked,
+    comments,
+    setComments,
+  });
 
   return (
     <>
-    {showModal && (
-        <Modal open={showModal} closeIcon closeOnDimmerClick onClose={() => setShowModal(false)}>
-            <Modal.Content>
-                {post.picUrl ? <ImageModal {...addPropsToModal()}/> : <NoImageModal {...addPropsToModal()}/>}
-            </Modal.Content>
+      {showModal && (
+        <Modal
+          open={showModal}
+          closeIcon
+          closeOnDimmerClick
+          onClose={() => setShowModal(false)}
+        >
+          <Modal.Content>
+            {post.picUrl ? (
+              <ImageModal {...addPropsToModal()} />
+            ) : (
+              <NoImageModal {...addPropsToModal()} />
+            )}
+          </Modal.Content>
         </Modal>
-    )}
+      )}
       <Segment basic>
         <Card color="teal" fluid>
           {post.picUrl && (
@@ -150,7 +159,13 @@ const CardPost = ({ post, user, setPosts, setShowToastr }) => {
               )}
 
             {comments.length > 3 && (
-              <Button content="View more" onClick={() => setShowModal(true)} color="teal" basic circular />
+              <Button
+                content="View more"
+                onClick={() => setShowModal(true)}
+                color="teal"
+                basic
+                circular
+              />
             )}
             <Divider hidden />
 
