@@ -199,4 +199,26 @@ router.post("/update", authMiddleware, async (req, res) => {
   }
 });
 
+router.post("/settings/password", authMiddleware, async (req, res) => {
+  try {
+    const { userId } = req;
+    const { currentPassword, newPassword } = req.body;
+
+    if (newPassword.length < 6) {
+      return res.status(401).send("Password must be at least 6 characters");
+    }
+    const user = await UserModel.findById(userId).select("+password");
+    const isPassword = await brcypt.compare(currentPassword, user.password);
+    if (!isPassword) {
+      return res.status(401).send("Invalid password");
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;
