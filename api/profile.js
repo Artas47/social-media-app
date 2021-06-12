@@ -221,4 +221,23 @@ router.post("/settings/password", authMiddleware, async (req, res) => {
   }
 });
 
+router.post("/settings/messagePopup", authMiddleware, async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.userId);
+
+    if (user.newMessagePopup) {
+      user.newMessagePopup = false;
+      await user.save();
+    } else {
+      user.newMessagePopup = true;
+      await user.save();
+    }
+
+    return res.send(200).send("Success");
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;
