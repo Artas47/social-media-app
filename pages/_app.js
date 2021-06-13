@@ -23,6 +23,8 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
     ctx.pathname === "/" ||
     ctx.pathname === "/messages" ||
     ctx.pathname === "/notifications" ||
+    ctx.pathname === "/[username]" ||
+    ctx.pathname === "/post/[postId]" ||
     ctx.pathname === "/";
 
   if (!token) {
