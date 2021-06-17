@@ -4,6 +4,7 @@ import { parseCookies } from "nookies";
 import { baseUrl } from "../utils/baseUrl";
 import { NoProfile } from "../components/Layout/NoData";
 import axios from "axios";
+import { Grid } from "semantic-ui-react";
 
 const ProfilePage = ({
   profile,
@@ -16,10 +17,12 @@ const ProfilePage = ({
   const router = useRouter();
   const { username } = router.query;
   const [posts, setPosts] = useState([]);
+  const [activeItem, setActiveItem] = useState("profile");
+  const [loggedUserFollowStats, setLoggedUserFollowStats] = useState(
+    userFollowStats
+  );
 
-  if (errorLoading) {
-    return <NoProfile />;
-  }
+  const ownAccount = profile.iser._id === user._id;
 
   useEffect(() => {
     const getPosts = async () => {
@@ -42,7 +45,32 @@ const ProfilePage = ({
     getPosts();
   }, []);
 
-  return <div> HII {username}</div>;
+  const handleItemClick = (item) => {
+    setActiveItem(item);
+  };
+
+  if (errorLoading) {
+    return <NoProfile />;
+  }
+
+  return (
+    <>
+      <Grid stackable>
+        <Grid.Row>
+          <Grid.Column>
+            <ProfileMenuTabs
+              activeItem={activeItem}
+              handleItemClick={handleItemClick}
+              followersLength={followersLength}
+              followingLength={followingLength}
+              ownAccount={ownAccount}
+              loggedUserFollowStats={loggedUserFollowStats}
+            />
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    </>
+  );
 };
 
 ProfilePage.getInitialProps = async (ctx) => {
